@@ -22,10 +22,10 @@ from dotenv import load_dotenv
 
 class ECCManager:
     def __init__(self):
-        self.salt = str(os.environ.get("SALT")).encode("utf-8")
-        self.iterations = int(os.environ["ITERATIONS"])
-        self.private_key_path = os.environ["PRIVATE_KEY_PATH"]
-        self.public_key_path = os.environ["PUBLIC_KEY_PATH"]
+        self._salt = str(os.environ.get("SALT")).encode("utf-8")
+        self._iterations = int(os.environ["ITERATIONS"])
+        self._private_key_path = os.environ["PRIVATE_KEY_PATH"]
+        self._public_key_path = os.environ["PUBLIC_KEY_PATH"]
 
     def generate_salt(self):
         """
@@ -41,7 +41,7 @@ class ECCManager:
         """
         # Generate private key bytes using PBKDF2
         private_key_bytes = hashlib.pbkdf2_hmac(
-            "sha256", password.encode(), self.salt, self.iterations, dklen=32
+            "sha256", password.encode(), self._salt, self._iterations, dklen=32
         )
         # Ensure the private key is within the valid range for secp256k1
         order = SECP256k1.order
@@ -61,10 +61,10 @@ class ECCManager:
         private_key, public_key = self.derive_keys(password)
 
         # Save keys to files
-        with open(self.private_key_path, "wb") as priv_file:
+        with open(self._private_key_path, "wb") as priv_file:
             priv_file.write(private_key)
 
-        with open(self.public_key_path, "wb") as pub_file:
+        with open(self._public_key_path, "wb") as pub_file:
             pub_file.write(public_key)
 
         print("Keys generated and saved as private_key.pem and public_key.pem")
@@ -73,7 +73,7 @@ class ECCManager:
         """
         Encrypt a file using a public key.
         """
-        with open(self.public_key_path, "rb") as pub_file:
+        with open(self._public_key_path, "rb") as pub_file:
             public_key = pub_file.read()
 
         with open(input_file, "rb") as infile:
@@ -90,7 +90,7 @@ class ECCManager:
         """
         Decrypt a file using a private key.
         """
-        with open(self.private_key_path, "rb") as priv_file:
+        with open(self._private_key_path, "rb") as priv_file:
             private_key = priv_file.read()
 
         with open(input_file, "rb") as infile:
@@ -107,7 +107,7 @@ class ECCManager:
         """
         Sign a file using a private key.
         """
-        with open(self.private_key_path, "rb") as priv_file:
+        with open(self._private_key_path, "rb") as priv_file:
             private_key = priv_file.read()
 
         sk = SigningKey.from_string(private_key, curve=SECP256k1)
