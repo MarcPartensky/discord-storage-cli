@@ -10,6 +10,7 @@ Functions:
     - Receive file from discord then decrypt
 """
 
+import os
 import hashlib
 import getpass
 import ecies
@@ -20,9 +21,17 @@ from dotenv import load_dotenv
 
 
 class ECCManager:
-    def __init__(self, salt=b"default_salt", iterations=100000):
-        self.salt = salt
-        self.iterations = iterations
+    def __init__(self):
+        self.salt = os.environ.get("SALT")
+        self.iterations = os.environ["ITERATIONS"]
+
+    def generate_salt(self):
+        """
+        Generate a random salt and print it.
+        """
+        salt = os.urandom(16)
+        print(f"Salt: {salt.hex()}")
+        return salt
 
     def derive_keys(self, password: str):
         """
