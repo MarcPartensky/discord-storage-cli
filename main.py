@@ -22,7 +22,9 @@ from dotenv import load_dotenv
 
 class ECCManager:
     def __init__(self):
-        self.salt = os.environ.get("SALT")
+        salt = os.environ.get("SALT")
+        if salt:
+            self.salt = salt.encode("utf-8")
         self.iterations = os.environ["ITERATIONS"]
 
     def generate_salt(self):
