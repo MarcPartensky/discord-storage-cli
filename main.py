@@ -22,10 +22,10 @@ from dotenv import load_dotenv
 
 class ECCManager:
     def __init__(self):
-        self.salt = os.environ.get("SALT")
-        if self.salt:
-            self.salt = self.salt.encode("utf-8")
+        self.salt = str(os.environ.get("SALT")).encode("utf-8")
         self.iterations = int(os.environ["ITERATIONS"])
+        self.private_key_path = os.environ["PRIVATE_KEY_PATH"]
+        self.public_key_path = os.environ["PUBLIC_KEY_PATH"]
 
     def generate_salt(self):
         """
@@ -61,19 +61,19 @@ class ECCManager:
         private_key, public_key = self.derive_keys(password)
 
         # Save keys to files
-        with open("private_key.pem", "wb") as priv_file:
+        with open(self.private_key_path, "wb") as priv_file:
             priv_file.write(private_key)
 
-        with open("public_key.pem", "wb") as pub_file:
+        with open(self.public_key_path, "wb") as pub_file:
             pub_file.write(public_key)
 
         print("Keys generated and saved as private_key.pem and public_key.pem")
 
-    def encrypt(self, public_key_path: str, input_file: str, output_file: str):
+    def encrypt(self, input_file: str, output_file: str):
         """
         Encrypt a file using a public key.
         """
-        with open(public_key_path, "rb") as pub_file:
+        with open(self.public_key_path, "rb") as pub_file:
             public_key = pub_file.read()
 
         with open(input_file, "rb") as infile:
@@ -86,11 +86,11 @@ class ECCManager:
 
         print(f"File encrypted and saved to {output_file}")
 
-    def decrypt(self, private_key_path: str, input_file: str, output_file: str):
+    def decrypt(self, input_file: str, output_file: str):
         """
         Decrypt a file using a private key.
         """
-        with open(private_key_path, "rb") as priv_file:
+        with open(self.private_key_path, "rb") as priv_file:
             private_key = priv_file.read()
 
         with open(input_file, "rb") as infile:
@@ -103,11 +103,11 @@ class ECCManager:
 
         print(f"File decrypted and saved to {output_file}")
 
-    def sign(self, private_key_path: str, input_file: str, signature_file: str):
+    def sign(self, input_file: str, signature_file: str):
         """
         Sign a file using a private key.
         """
-        with open(private_key_path, "rb") as priv_file:
+        with open(self.private_key_path, "rb") as priv_file:
             private_key = priv_file.read()
 
         sk = SigningKey.from_string(private_key, curve=SECP256k1)
