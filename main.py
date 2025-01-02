@@ -22,10 +22,10 @@ from dotenv import load_dotenv
 
 class ECCManager:
     def __init__(self):
-        salt = os.environ.get("SALT")
-        if salt:
-            self.salt = salt.encode("utf-8")
-        self.iterations = os.environ["ITERATIONS"]
+        self.salt = os.environ.get("SALT")
+        if self.salt:
+            self.salt = self.salt.encode("utf-8")
+        self.iterations = int(os.environ["ITERATIONS"])
 
     def generate_salt(self):
         """
@@ -33,7 +33,7 @@ class ECCManager:
         """
         salt = os.urandom(16)
         print(f"Salt: {salt.hex()}")
-        return salt
+        # return salt
 
     def derive_keys(self, password: str):
         """
